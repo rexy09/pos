@@ -43,7 +43,7 @@ const Navbar = () => {
                             </a>
                             <ul id="product" className="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                                
-                               <Link to="products_list">
+                               <Link to="productsList">
                                 <li className="">
                                     <a href=''>
                                         <i className="las la-minus"></i><span>List Product</span>
@@ -71,7 +71,7 @@ const Navbar = () => {
                             </a>
                             <ul id="category" className="iq-submenu collapse" data-parent="#iq-sidebar-toggle">
                                 
-                                <Link to="products_categories">
+                                <Link to="productsCategories">
                                 <li className="">
                                     <a href="../backend/page-list-category.html">
                                         <i className="las la-minus"></i><span>List Category</span>

@@ -8,7 +8,7 @@ const Topbar =() =>{
                         <div className="iq-navbar-logo d-flex align-items-center justify-content-between">
                             <i className="ri-menu-line wrapper-menu"></i>
                             <a href="../backend/index.html" className="header-logo">
-                                <img src="../assets/images/logo.png" className="img-fluid rounded-normal" alt="logo" />
+                                <img src="../cdn/images/logo.png" className="img-fluid rounded-normal" alt="logo" />
                                 <h5 className="logo-title ml-3">POSDash</h5>
 
                             </a>
@@ -77,7 +77,7 @@ const Topbar =() =>{
                                     </li>
                                     <li className="nav-item nav-icon dropdown">
                                         <a href="#" className="search-toggle dropdown-toggle" id="dropdownMenuButton2"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                 stroke-linejoin="round" className="feather feather-mail">

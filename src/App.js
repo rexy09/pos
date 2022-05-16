@@ -6,8 +6,8 @@ import { Home, ProductsList, ProductsCategories } from './pages';
 // import logo from './logo.svg';
 import './App.css';
 
-class App extends Component {
-  render() {
+const App = () => {
+  
     return (
       <div className='app'>
         <div className='wrapper'>
@@ -16,17 +16,15 @@ class App extends Component {
           
           <Routes>
             <Route path="/" element={ <Home />} />
-            <Route path="products_list" element={ <ProductsList />} />
-            <Route path="products_categories" element={ <ProductsCategories />} />
+            <Route path="productsList" element={ <ProductsList />} />
+            <Route path="productsCategories" element={ <ProductsCategories />} />
+          
           </Routes>
-
           <Footer />
         </div>
       </div>
-
-
     );
-  }
+
 }
 
 export default App;
