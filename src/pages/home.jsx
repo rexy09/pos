@@ -177,7 +177,7 @@ const Home = () => {
                                             <div className="card card-block card-stretch card-height mb-0">
                                                 <div className="card-body">
                                                     <div className="bg-warning-light rounded">
-                                                        <img src="../assets/images/product/01.png" className="style-img img-fluid m-auto p-3" alt="image" />
+                                                        <img src="../assets/images/product/01.png" className="style-img img-fluid m-auto p-3" alt="" />
                                                     </div>
                                                     <div className="style-text text-left mt-3">
                                                         <h5 className="mb-1">Organic Cream</h5>
@@ -190,7 +190,7 @@ const Home = () => {
                                             <div className="card card-block card-stretch card-height mb-0">
                                                 <div className="card-body">
                                                     <div className="bg-danger-light rounded">
-                                                        <img src="../assets/images/product/02.png" className="style-img img-fluid m-auto p-3" alt="image" />
+                                                        <img src="../assets/images/product/02.png" className="style-img img-fluid m-auto p-3" alt="" />
                                                     </div>
                                                     <div className="style-text text-left mt-3">
                                                         <h5 className="mb-1">Rain Umbrella</h5>
@@ -203,7 +203,7 @@ const Home = () => {
                                             <div className="card card-block card-stretch card-height mb-0">
                                                 <div className="card-body">
                                                     <div className="bg-info-light rounded">
-                                                        <img src="../assets/images/product/03.png" className="style-img img-fluid m-auto p-3" alt="image" />
+                                                        <img src="../assets/images/product/03.png" className="style-img img-fluid m-auto p-3" alt="" />
                                                     </div>
                                                     <div className="style-text text-left mt-3">
                                                         <h5 className="mb-1">Serum Bottle</h5>
@@ -216,7 +216,7 @@ const Home = () => {
                                             <div className="card card-block card-stretch card-height mb-0">
                                                 <div className="card-body">
                                                     <div className="bg-success-light rounded">
-                                                        <img src="../assets/images/product/02.png" className="style-img img-fluid m-auto p-3" alt="image" />
+                                                        <img src="../assets/images/product/02.png" className="style-img img-fluid m-auto p-3" alt="" />
                                                     </div>
                                                     <div className="style-text text-left mt-3">
                                                         <h5 className="mb-1">Organic Cream</h5>
@@ -244,7 +244,7 @@ const Home = () => {
                                 <div className="card-body card-item-right">
                                     <div className="d-flex align-items-top">
                                         <div className="bg-warning-light rounded">
-                                            <img src="../assets/images/product/04.png" className="style-img img-fluid m-auto" alt="image" />
+                                            <img src="../assets/images/product/04.png" className="style-img img-fluid m-auto" alt="" />
                                         </div>
                                         <div className="style-text text-left">
                                             <h5 className="mb-2">Coffee Beans Packet</h5>
@@ -258,7 +258,7 @@ const Home = () => {
                                 <div className="card-body card-item-right">
                                     <div className="d-flex align-items-top">
                                         <div className="bg-danger-light rounded">
-                                            <img src="../assets/images/product/05.png" className="style-img img-fluid m-auto" alt="image" />
+                                            <img src="../assets/images/product/05.png" className="style-img img-fluid m-auto" alt="" />
                                         </div>
                                         <div className="style-text text-left">
                                             <h5 className="mb-2">Bottle Cup Set</h5>
