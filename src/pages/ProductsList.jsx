@@ -1,6 +1,114 @@
-import React from 'react';
+import { React, useState } from 'react';
+import { useGetProductListQuery, useAddProductMutation, useEditProductMutation, useDeleteProductMutation } from '../services/productListSlice';
+import { useGetProductCategoriesQuery } from '../services/productCategoriesSlice';
+import { CheckInternetConnection, Loader, EmptyTable } from '../components';
 
 const ProductsList = () => {
+    // Hooks Section
+    var baseurl = 'http://127.0.0.1:8000'
+
+    // Fetching All Products
+    const { data: productList, isFetching, isError } = useGetProductListQuery();
+    const { data: productCategoriesList } = useGetProductCategoriesQuery();
+
+    // Editing All Products
+    // - Cloning Fetched Object
+    // const [editproductprofile, setEditProduct] = useState({})
+
+    // - Capturing new inputs
+    const [editproductid, setEditProductId] = useState(null)
+    const [editproductname, setEditProductName] = useState(null)
+    const [editproductcategory, setEditProductCategory] = useState(null)
+    const [editproductbardcode, setEditProductBarcode] = useState(null)
+    const [editproductbrand, setEditProductBrand] = useState(null)
+    const [editproductspecification, setEditProductSpecification] = useState(null)
+    const [editproductStoked, setEditProductStoked] = useState(false)
+    const [editproductdescription, setEditProductDescription] = useState(null)
+    const [editproductminquantity, setEditProductMinQuantity] = useState(null)
+    const [editproductwholesaleprice, setEditProductWholesalePrice] = useState(null)
+    const [editproductretailprice, setEditProductRetailPrice] = useState(null)
+    const [editproductimage, setEditProductImage] = useState(null)
+
+
+    const [useEditProduct] = useEditProductMutation()
+    const handleStocked = (e) => {
+        e.preventDefault();
+        setEditProductStoked(!editproductStoked)
+    }
+
+    const handleCapturedProductData = (e) => {
+        e.preventDefault();
+        var editproductprofile = {
+            id: parseInt(editproductid),
+            category: parseInt(editproductcategory),
+            name: editproductname,
+            barcode: editproductbardcode,
+            brand: editproductbrand,
+            specification: editproductspecification,
+            description: editproductdescription,
+            stocked: editproductStoked,
+            min_quantity: parseInt(editproductminquantity),
+            wholesale_price: parseFloat(editproductwholesaleprice),
+            retail_price: parseFloat(editproductretailprice),
+            image: editproductimage
+        }
+        useEditProduct(editproductprofile)
+    }
+
+    // Deleting All Products
+    const [deleteproductname, setDeleteProductName] = useState('')
+    const [deleteproductid, setDeleteProductId] = useState()
+    const [deleteProduct] = useDeleteProductMutation()
+    const deleteProductSubmit = (e) => {
+        e.preventDefault()
+        deleteProduct({ id: deleteproductid })
+    }
+
+
+
+
+    // Adding All Products
+    const [productprofile, setAddNewProduct] = useState({})
+    const [productthumbnail, setProductThumbnail] = useState(null)
+    const [productphotos, setProductPhotos] = useState(null)
+    const [productcategory, setProductCategory] = useState(0)
+    const [productminquantity, setProductMinQuantity] = useState(0)
+    const [productwholesaleprice, setProductWholesalePrice] = useState(0)
+    const [productretailprice, setProductRetailPrice] = useState(0)
+
+    const handleChange = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        setAddNewProduct(values => ({ ...values, [name]: value }))
+    }
+
+    const [addProduct] = useAddProductMutation()
+    const addProductSubmit = (e) => {
+        e.preventDefault();
+
+        const imageData1 = new FormData()
+        imageData1.append("productthumbnail", productthumbnail)
+
+        const imageData2 = new FormData()
+        imageData2.append('name', productphotos)
+
+        var injectedObjects = {
+            category: parseInt(productcategory),
+            min_quantity: parseInt(productminquantity),
+            wholesale_price: parseFloat(productwholesaleprice),
+            retail_price: parseFloat(productretailprice),
+            image: productthumbnail,
+            product_images: productphotos
+        }
+        var updatedproductprofile = { ...productprofile, ...injectedObjects }
+        addProduct(updatedproductprofile)
+    }
+    if (isFetching) {
+        return <Loader />
+    }
+    if (isError) {
+        return <CheckInternetConnection />
+    }
     return (
         <div>
             <div className="modal fade" id="new-order" tabIndex="-1" role="dialog" aria-hidden="true">
@@ -34,7 +142,7 @@ const ProductsList = () => {
                                     <h4 className="mb-3">Product List</h4>
                                     <p className="mb-0">The product list effectively dictates product presentation and provides space<br /> to list your products and offering in the most appealing way.</p>
                                 </div>
-                                <a href="page-add-product.html" className="btn btn-primary add-list"><i className="las la-plus mr-3"></i>Add Product</a>
+                                <a data-toggle="modal" data-target="#new-product" className="btn btn-primary add-list"><i className="las la-plus mr-3"></i>Add Product</a>
                             </div>
                         </div>
                         <div className="col-lg-12">
@@ -48,314 +156,65 @@ const ProductsList = () => {
                                                     <label for="checkbox1" className="mb-0"></label>
                                                 </div>
                                             </th>
-                                            <th>Product</th>
-                                            <th>Code</th>
+                                            <th>Image</th>
+                                            <th>Name</th>
+                                            <th>Barcode</th>
                                             <th>Category</th>
-                                            <th>Price</th>
-                                            <th>Brand Name</th>
-                                            <th>Cost</th>
-                                            <th>Quantity</th>
+                                            <th>Brand</th>
+                                            <th>Description</th>
+                                            <th>Specification</th>
+                                            <th>Min quantity</th>
+                                            <th>Wholesale price</th>
+                                            <th>Retail price</th>
+                                            <th>Stocked</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="ligth-body">
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox2" />
-                                                    <label for="checkbox2" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/01.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Organic Cream
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>CREM01</td>
-                                            <td>Beauty</td>
-                                            <td>$25.00</td>
-                                            <td>Lakme</td>
-                                            <td>$10.00</td>
-                                            <td>10.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox3" />
-                                                    <label for="checkbox3" className="mb-0" ></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/02.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Rain Umbrella
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>UM01</td>
-                                            <td>Grocery</td>
-                                            <td>$30.00</td>
-                                            <td>Sun</td>
-                                            <td>$20.00</td>
-                                            <td>15.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox4" />
-                                                    <label for="checkbox4" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/03.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Serum Bottle
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>SEM01</td>
-                                            <td>Beauty</td>
-                                            <td>$50.00</td>
-                                            <td>Blushing</td>
-                                            <td>$25.00</td>
-                                            <td>50.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox5" />
-                                                    <label for="checkbox5" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/04.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Coffee Beans
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>COF01</td>
-                                            <td>Food</td>
-                                            <td>$32.00</td>
-                                            <td>Nescafe</td>
-                                            <td>$20.00</td>
-                                            <td>50.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox6" />
-                                                    <label for="checkbox6" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/05.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Book Shelves
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>FUN01</td>
-                                            <td>Furniture</td>
-                                            <td>$30.00</td>
-                                            <td>Vintage</td>
-                                            <td>$30.00</td>
-                                            <td>25.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox7" />
-                                                    <label for="checkbox7" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/06.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Dinner Set
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>DIS01</td>
-                                            <td>Grocery</td>
-                                            <td>$30.00</td>
-                                            <td>Rancher's</td>
-                                            <td>$20.00</td>
-                                            <td>50.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox8" />
-                                                    <label for="checkbox8" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/07.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Nike Shoes
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>NIS01</td>
-                                            <td>Shoes</td>
-                                            <td>$78.00</td>
-                                            <td>Nike</td>
-                                            <td>$50.00</td>
-                                            <td>100.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox9" />
-                                                    <label for="checkbox9" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/08.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Computer Glasses
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>COG01</td>
-                                            <td>Frames</td>
-                                            <td>$25.00</td>
-                                            <td>Ray-Ban</td>
-                                            <td>$20.00</td>
-                                            <td>30.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="checkbox d-inline-block">
-                                                    <input type="checkbox" className="checkbox-input" id="checkbox10" />
-                                                    <label for="checkbox10" className="mb-0"></label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src="../assets/images/table/product/09.jpg" className="img-fluid rounded avatar-50 mr-3" alt="image" />
-                                                    <div>
-                                                        Alloy Jewel Set
-                                                        <p className="mb-0"><small>This is test Product</small></p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>AJS01</td>
-                                            <td>Jewellery</td>
-                                            <td>$150.00</td>
-                                            <td>Jazzin</td>
-                                            <td>$50.00</td>
-                                            <td>200.0</td>
-                                            <td>
-                                                <div className="d-flex align-items-center list-action">
-                                                    <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
-                                                        href="#"><i className="ri-eye-line mr-0"></i></a>
-                                                    <a className="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"
-                                                        href="#"><i className="ri-pencil-line mr-0"></i></a>
-                                                    <a className="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"
-                                                        href="#"><i className="ri-delete-bin-line mr-0"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {
+                                            productList.length == 0 ?
+                                                <EmptyTable name='Products' />
+                                                :
+                                                productList.map(product => (
+                                                    <tr>
+                                                        <td>
+                                                            <div className="checkbox d-inline-block">
+                                                                <input type="checkbox" className="checkbox-input" id="checkbox2" />
+                                                                <label for="checkbox2" className="mb-0"></label>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="d-flex align-items-center">
+                                                                <img src='' className="img-fluid rounded avatar-50 mr-3" alt="image" />
+                                                            </div>
+                                                        </td>
+                                                        <td>{product.name}</td>
+                                                        <td>{product.barcode}</td>
+                                                        <td>{product.category}</td>
+                                                        <td>{product.brand}</td>
+                                                        <td>{product.description}</td>
+                                                        <td>{product.specification}</td>
+                                                        <td>{product.min_quantity}</td>
+                                                        <td>{product.wholesale_price}</td>
+                                                        <td>{product.retail_price}</td>
+                                                        <td>{product.stocked ? <h6 className='badge bg-success'>Stocked</h6>
+                                                            : <h6 className='badge badge-danger'>Not Stocked</h6>
+                                                        }</td>
+                                                        <td>
+                                                            <div className="d-flex align-items-center list-action">
+                                                                <a className="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="" data-original-title="View"
+                                                                    href="#"><i className="ri-eye-line mr-0"></i></a>
+                                                                <a className="badge bg-success mr-2" onClick={() => { setEditProductName(product.name); setEditProductCategory(product.category); setEditProductBarcode(product.barcode); setEditProductBrand(product.brand); setEditProductSpecification(product.specification); setEditProductDescription(product.description); setEditProductMinQuantity(product.min_quantity); setEditProductWholesalePrice(product.wholesale_price); setEditProductRetailPrice(product.retail_price); setEditProductId(product.id); setEditProductStoked(product.stocked); setEditProductImage(product.image) }} data-toggle="modal" data-target="#edit-product" data-placement="top" title="" data-original-title="Edit"
+                                                                    href="#"><i className="ri-pencil-line mr-0"></i></a>
+                                                                <a className="badge bg-warning mr-2" onClick={() => { setDeleteProductName(product.name); setDeleteProductId(product.id) }} data-toggle="modal" data-target="#delete-product" data-placement="top" title="" data-original-title="Delete"
+                                                                    href="#"><i className="ri-delete-bin-line mr-0"></i></a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+
+
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -363,34 +222,183 @@ const ProductsList = () => {
                     </div>
 
                 </div>
-
-                <div className="modal fade" id="edit-note" tabIndex="-1" role="dialog" aria-hidden="true">
+                {/* Adding Product Model */}
+                <div className="modal fade" id="new-product" tabIndex="-1" role="dialog" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="modal-body">
                                 <div className="popup text-left">
-                                    <div className="media align-items-top justify-content-between">
-                                        <h3 className="mb-3">Product</h3>
-                                        <div className="btn-cancel p-0" data-dismiss="modal"><i className="las la-times"></i></div>
-                                    </div>
-                                    <div className="content edit-notes">
-                                        <div className="card card-transparent card-block card-stretch event-note mb-0">
-                                            <div className="card-body px-0 bukmark">
-                                                <div className="d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
-                                                    <div className="quill-tool">
-                                                    </div>
-                                                </div>
-                                                <div id="quill-toolbar1">
-                                                    <p>Virtual Digital Marketing Course every week on Monday, Wednesday and Saturday.Virtual Digital Marketing Course every week on Monday</p>
+                                    <h4 className="mb-3">Add New Product</h4>
+                                    <div className="content create-workform bg-body">
+                                        <form>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product name</label>
+                                                <input type="text" className="form-control" name='name' value={productprofile.name || ""} onChange={handleChange} placeholder="Product name" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product category</label>
+                                                <select value={productcategory} onChange={(e) => setProductCategory(e.target.value)} className="form-control" aria-label="">
+                                                    <option selected>Select category</option>
+                                                    {
+                                                        productCategoriesList == undefined ? <h1>Loading...</h1> :
+                                                            productCategoriesList.map(category => (
+                                                                <option value={category.id}>{category.name}</option>
+                                                            ))
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product barcode</label>
+                                                <input type="text" className="form-control" name='barcode' value={productprofile.barcode} onChange={handleChange} placeholder="Product barcode" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product brand</label>
+                                                <input type="text" className="form-control" name='brand' value={productprofile.brand} onChange={handleChange} placeholder="Product brand" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product specification</label>
+                                                <input type="text" className="form-control" name='specification' value={productprofile.specification} onChange={handleChange} placeholder="Product specification" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product description</label>
+                                                <input type="text" className="form-control" name='description' value={productprofile.description} onChange={handleChange} placeholder="Product description" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product min quantity</label>
+                                                <input type="number" className="form-control" name='productminquantity' value={productminquantity} onChange={(e) => setProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product wholesale price</label>
+                                                <input type="number" className="form-control" name='productwholesaleprice' value={productwholesaleprice} onChange={(e) => setProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product retail price</label>
+                                                <input type="number" className="form-control" name='productretailprice' value={productretailprice} onChange={(e) => setProductRetailPrice(e.target.value)} placeholder="Product retail price" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product thumbnail</label><br></br>
+                                                <input type="file" accept="image/png,image/jpeg" onChange={(e) => setProductThumbnail(e.target.files[0])} placeholder="Product thumbnail" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product images</label><br></br>
+                                                <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                            </div>
+                                            <div className="col-lg-12 mt-4">
+                                                <div className="d-flex flex-wrap align-items-ceter justify-content-center">
+                                                    <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
+                                                    <div className="btn btn-outline-primary" onClick={addProductSubmit} data-dismiss="modal">Create</div>
                                                 </div>
                                             </div>
-                                            <div className="card-footer border-0">
-                                                <div className="d-flex flex-wrap align-items-ceter justify-content-end">
-                                                    <div className="btn btn-primary mr-3" data-dismiss="modal">Cancel</div>
-                                                    <div className="btn btn-outline-primary" data-dismiss="modal">Save</div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Editing Product Model */}
+                <div className="modal fade" id="edit-product" tabIndex="-1" role="dialog" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered" role="document">
+                        <div className="modal-content">
+                            <div className="modal-body">
+                                <div className="popup text-left">
+                                    <h4 className="mb-3">Edit Product</h4>
+                                    <div className="content create-workform bg-body">
+                                        <form>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product name</label>
+                                                <input type="text" className="form-control" name='editproductname' value={editproductname} onChange={(e) => setEditProductName(e.target.value)} placeholder="Product name" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product category</label>
+                                                <select value={editproductcategory} onChange={(e) => setEditProductCategory(e.target.value)} className="form-control" aria-label="">
+                                                    <option selected>Select category</option>
+                                                    {
+                                                        productCategoriesList == undefined ? <h1>Loading...</h1> :
+                                                            productCategoriesList.map(category => (
+                                                                <option value={category.id}>{category.name}</option>
+
+                                                            ))
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product barcode</label>
+                                                <input type="text" className="form-control" name='barcode' value={editproductbardcode} onChange={(e) => setEditProductBarcode(e.target.value)} placeholder="Product barcode" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product brand</label>
+                                                <input type="text" className="form-control" name='brand' value={editproductbrand} onChange={(e) => setEditProductBrand(e.target.value)} placeholder="Product brand" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product specification</label>
+                                                <input type="text" className="form-control" name='specification' value={editproductspecification} onChange={(e) => setEditProductSpecification(e.target.value)} placeholder="Product specification" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product description</label>
+                                                <input type="text" className="form-control" name='description' value={editproductdescription} onChange={(e) => setEditProductDescription(e.target.value)} placeholder="Product description" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product Stoked</label><br></br>
+                                                <input type="checkbox" name='productstoked' value='Any' checked={editproductStoked} onChange={handleStocked} />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product min quantity</label>
+                                                <input type="number" className="form-control" name='productminquantity' value={editproductminquantity} onChange={(e) => setEditProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product wholesale price</label>
+                                                <input type="number" className="form-control" name='productwholesaleprice' value={editproductwholesaleprice} onChange={(e) => setEditProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product retail price</label>
+                                                <input type="number" className="form-control" name='productretailprice' value={editproductretailprice} onChange={(e) => setEditProductRetailPrice(e.target.value)} placeholder="Product retail price" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product thumbnail</label><br></br>
+                                                <input type="file" accept="image/png,image/jpeg" onChange={(e) => setEditProductImage(e.target.files[0])} placeholder="Product thumbnail" />
+                                            </div>
+                                            <div className="pb-3">
+                                                <label className="mb-2">Product images</label><br></br>
+                                                <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                            </div>
+                                            <div className="col-lg-12 mt-4">
+                                                <div className="d-flex flex-wrap align-items-ceter justify-content-center">
+                                                    <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
+                                                    <div className="btn btn-outline-primary" onClick={handleCapturedProductData} data-dismiss="modal">Edit</div>
                                                 </div>
+                                            </div>
+                                        </form>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* Deleting Product Model */}
+                <div className="modal fade" id="delete-product" tabIndex="-1" role="dialog" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered" role="document">
+                        <div className="modal-content">
+                            <div className="modal-body">
+                                <div className="popup text-left">
+                                    <h4 className="mb-3">Delete Product</h4>
+                                    <div className="content create-workform bg-body">
+
+                                        <div className="pb-3">
+                                            <h5 className="mb-2">Are you sure your want to delete ?</h5>
+                                            <p style={{ color: "red" }}>{deleteproductname}</p>
+                                        </div>
+                                        <div className="col-lg-12 mt-4">
+                                            <div className="d-flex flex-wrap align-items-ceter justify-content-center">
+                                                <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
+                                                <div className="btn btn-outline-primary" onClick={deleteProductSubmit} data-dismiss="modal">Delete</div>
                                             </div>
                                         </div>
+
+
                                     </div>
                                 </div>
                             </div>

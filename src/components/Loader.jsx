@@ -1,5 +1,4 @@
 import React from 'react';
-// import ReactCircularLoader from 'react-circular-loader';
 import { SpinnerCircular } from 'spinners-react';
 
 const Loader = () => {
