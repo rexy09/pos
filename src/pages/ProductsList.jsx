@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useEffect, useState } from 'react';
 import { useGetProductListQuery, useAddProductMutation, useEditProductMutation, useDeleteProductMutation } from '../services/productListSlice';
 import { useGetProductCategoriesQuery } from '../services/productCategoriesSlice';
 import { CheckInternetConnection, Loader, EmptyTable } from '../components';
@@ -36,8 +36,29 @@ const ProductsList = () => {
         setEditProductStoked(!editproductStoked)
     }
 
+    // function handleEditProductThumbnail(event){
+    //     setEditProductImage(event.target.files[0])
+    // }
+
+
     const handleCapturedProductData = (e) => {
         e.preventDefault();
+        // const imagedata = new FormData();
+        // imagedata.append('editproductimage', editproductimage);
+        // for(var x of imagedata){
+        //     console.log(x[1])
+        // }
+        var extractedThumbnail
+        var reader = new FileReader();
+        reader.onloadend = () => {
+            extractedThumbnail = reader.result;
+            setEditProductImage(extractedThumbnail)
+
+        };
+        // reader.readAsDataURL(productthumbnail);
+        reader.readAsText(editproductimage);
+     
+
         var editproductprofile = {
             id: parseInt(editproductid),
             category: parseInt(editproductcategory),
@@ -86,22 +107,34 @@ const ProductsList = () => {
     const addProductSubmit = (e) => {
         e.preventDefault();
 
-        const imageData1 = new FormData()
-        imageData1.append("productthumbnail", productthumbnail)
+        // const imageData1 = new FormData()
+        // imageData1.append("productthumbnail", productthumbnail)
 
-        const imageData2 = new FormData()
-        imageData2.append('name', productphotos)
+        // const imageData2 = new FormData()
+        // imageData2.append('name', productphotos)
+
+        console.log(productthumbnail)
+
+        // var extractedThumbnail
+        // var reader = new FileReader();
+        // reader.onloadend = () => {
+        //     extractedThumbnail = reader.result;
+        // console.log(extractedThumbnail)
+
+        // };
+        // // reader.readAsDataURL(productthumbnail);
+        // reader.readAsText(productthumbnail);
 
         var injectedObjects = {
             category: parseInt(productcategory),
             min_quantity: parseInt(productminquantity),
             wholesale_price: parseFloat(productwholesaleprice),
             retail_price: parseFloat(productretailprice),
-            image: productthumbnail,
+            image: productthumbnail.name,
             product_images: productphotos
         }
         var updatedproductprofile = { ...productprofile, ...injectedObjects }
-        addProduct(updatedproductprofile)
+        // addProduct(updatedproductprofile)
     }
     if (isFetching) {
         return <Loader />
@@ -275,13 +308,21 @@ const ProductsList = () => {
                                                 <label className="mb-2">Product retail price</label>
                                                 <input type="number" className="form-control" name='productretailprice' value={productretailprice} onChange={(e) => setProductRetailPrice(e.target.value)} placeholder="Product retail price" />
                                             </div>
+                                            {
+                                                productthumbnail != null ?
+                                                    <div>
+                                                        <img src={URL.createObjectURL(productthumbnail)} style={{ height: "200px", width: "200px" }} /> <h6>{productthumbnail.name}</h6>
+                                                    </div> :
+                                                    <h6></h6>
+                                            }
+
                                             <div className="pb-3">
                                                 <label className="mb-2">Product thumbnail</label><br></br>
-                                                <input type="file" accept="image/png,image/jpeg" onChange={(e) => setProductThumbnail(e.target.files[0])} placeholder="Product thumbnail" />
+                                                <input type="file" accept="image/*" onChange={(e) => setProductThumbnail(e.target.files[0])} placeholder="Product thumbnail" />
                                             </div>
                                             <div className="pb-3">
                                                 <label className="mb-2">Product images</label><br></br>
-                                                <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                                <input type="file" accept="image/*" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
                                             </div>
                                             <div className="col-lg-12 mt-4">
                                                 <div className="d-flex flex-wrap align-items-ceter justify-content-center">
@@ -306,7 +347,7 @@ const ProductsList = () => {
                                 <div className="popup text-left">
                                     <h4 className="mb-3">Edit Product</h4>
                                     <div className="content create-workform bg-body">
-                                        <form>
+                                        <form encType='multipart/form-data'>
                                             <div className="pb-3">
                                                 <label className="mb-2">Product name</label>
                                                 <input type="text" className="form-control" name='editproductname' value={editproductname} onChange={(e) => setEditProductName(e.target.value)} placeholder="Product name" />
@@ -358,8 +399,16 @@ const ProductsList = () => {
                                             </div>
                                             <div className="pb-3">
                                                 <label className="mb-2">Product thumbnail</label><br></br>
-                                                <input type="file" accept="image/png,image/jpeg" onChange={(e) => setEditProductImage(e.target.files[0])} placeholder="Product thumbnail" />
+                                                <input type="file" accept="image/png,image/jpeg" name='editproductimage' onChange={(e) => setEditProductImage(e.target.files[0])} />
                                             </div>
+                                            {/* {
+                                                editproductimage != null ?
+                                                    <div>
+                                                        <img src={URL.createObjectURL(editproductimage)} style={{ height: "200px", width: "200px" }} /> <h6>{editproductimage.name}</h6>
+                                                    </div> :
+                                                    <h6></h6>
+                                            } */}
+
                                             <div className="pb-3">
                                                 <label className="mb-2">Product images</label><br></br>
                                                 <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
@@ -367,7 +416,7 @@ const ProductsList = () => {
                                             <div className="col-lg-12 mt-4">
                                                 <div className="d-flex flex-wrap align-items-ceter justify-content-center">
                                                     <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
-                                                    <div className="btn btn-outline-primary" onClick={handleCapturedProductData} data-dismiss="modal">Edit</div>
+                                                    <button className="btn btn-outline-primary" onClick={handleCapturedProductData} type='submit' data-dismiss="modal">Edit</button>
                                                 </div>
                                             </div>
                                         </form>

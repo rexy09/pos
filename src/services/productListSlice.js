@@ -3,6 +3,8 @@ const baseUrl = 'http://127.0.0.1:8000/inventory/'
 
 const Headers = {
     'Content-Type':'multipart/form-data',
+    'Accept':'application/json',
+   
 }
 
 const createRequest = (url) => ({ url, headers:Headers })
