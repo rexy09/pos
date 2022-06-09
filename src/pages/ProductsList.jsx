@@ -28,7 +28,10 @@ const ProductsList = () => {
     const [editproductwholesaleprice, setEditProductWholesalePrice] = useState(null)
     const [editproductretailprice, setEditProductRetailPrice] = useState(null)
     const [editproductimage, setEditProductImage] = useState(null)
+    const [imagetobase64, setEditProductImageBase64] = useState(null)
 
+
+    let extractedThumbnail
 
     const [useEditProduct] = useEditProductMutation()
     const handleStocked = (e) => {
@@ -36,29 +39,27 @@ const ProductsList = () => {
         setEditProductStoked(!editproductStoked)
     }
 
-    // function handleEditProductThumbnail(event){
-    //     setEditProductImage(event.target.files[0])
+
+    // Thumbanil Image to base64
+    // const ThumbnailBase64Converter = (e) => {
+    //     var file = e.target.files[0];
+    //     var reader = new FileReader();
+    //     reader.onloadend = () => {
+    //         extractedThumbnail = reader.result;
+    //         setEditProductImage(extractedThumbnail)
+    //     };
+    //     reader.readAsDataURL(file);
+
     // }
+
 
 
     const handleCapturedProductData = (e) => {
         e.preventDefault();
-        // const imagedata = new FormData();
-        // imagedata.append('editproductimage', editproductimage);
-        // for(var x of imagedata){
-        //     console.log(x[1])
-        // }
-        var extractedThumbnail
-        var reader = new FileReader();
-        reader.onloadend = () => {
-            extractedThumbnail = reader.result;
-            setEditProductImage(extractedThumbnail)
 
-        };
-        // reader.readAsDataURL(productthumbnail);
-        reader.readAsText(editproductimage);
-     
-
+        const thumbnailImage = new FormData();
+        thumbnailImage.append('editproductimage',editproductimage)
+        
         var editproductprofile = {
             id: parseInt(editproductid),
             category: parseInt(editproductcategory),
@@ -71,8 +72,9 @@ const ProductsList = () => {
             min_quantity: parseInt(editproductminquantity),
             wholesale_price: parseFloat(editproductwholesaleprice),
             retail_price: parseFloat(editproductretailprice),
-            image: editproductimage
+            image: thumbnailImage
         }
+        
         useEditProduct(editproductprofile)
     }
 
@@ -84,9 +86,6 @@ const ProductsList = () => {
         e.preventDefault()
         deleteProduct({ id: deleteproductid })
     }
-
-
-
 
     // Adding All Products
     const [productprofile, setAddNewProduct] = useState({})
@@ -113,7 +112,7 @@ const ProductsList = () => {
         // const imageData2 = new FormData()
         // imageData2.append('name', productphotos)
 
-        console.log(productthumbnail)
+        // console.log(productthumbnail)
 
         // var extractedThumbnail
         // var reader = new FileReader();
@@ -134,7 +133,7 @@ const ProductsList = () => {
             product_images: productphotos
         }
         var updatedproductprofile = { ...productprofile, ...injectedObjects }
-        // addProduct(updatedproductprofile)
+        addProduct(updatedproductprofile)
     }
     if (isFetching) {
         return <Loader />
@@ -257,73 +256,81 @@ const ProductsList = () => {
                 </div>
                 {/* Adding Product Model */}
                 <div className="modal fade" id="new-product" tabIndex="-1" role="dialog" aria-hidden="true">
-                    <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-dialog modal-xl modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="modal-body">
                                 <div className="popup text-left">
                                     <h4 className="mb-3">Add New Product</h4>
                                     <div className="content create-workform bg-body">
                                         <form>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product name</label>
-                                                <input type="text" className="form-control" name='name' value={productprofile.name || ""} onChange={handleChange} placeholder="Product name" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product category</label>
-                                                <select value={productcategory} onChange={(e) => setProductCategory(e.target.value)} className="form-control" aria-label="">
-                                                    <option selected>Select category</option>
+                                            <div className='row'>
+                                                <div className='col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12 col-12'>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product name</label>
+                                                        <input type="text" className="form-control" name='name' value={productprofile.name || ""} onChange={handleChange} placeholder="Product name" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product category</label>
+                                                        <select value={productcategory} onChange={(e) => setProductCategory(e.target.value)} className="form-control" aria-label="">
+                                                            <option selected>Select category</option>
+                                                            {
+                                                                productCategoriesList == undefined ? <h1>Loading...</h1> :
+                                                                    productCategoriesList.map(category => (
+                                                                        <option value={category.id}>{category.name}</option>
+                                                                    ))
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product barcode</label>
+                                                        <input type="text" className="form-control" name='barcode' value={productprofile.barcode} onChange={handleChange} placeholder="Product barcode" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product brand</label>
+                                                        <input type="text" className="form-control" name='brand' value={productprofile.brand} onChange={handleChange} placeholder="Product brand" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product specification</label>
+                                                        <input type="text" className="form-control" name='specification' value={productprofile.specification} onChange={handleChange} placeholder="Product specification" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product description</label>
+                                                        <input type="text" className="form-control" name='description' value={productprofile.description} onChange={handleChange} placeholder="Product description" />
+                                                    </div>
+                                                </div>
+                                                <div className='col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12 col-12'>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product min quantity</label>
+                                                        <input type="number" className="form-control" name='productminquantity' value={productminquantity} onChange={(e) => setProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product wholesale price</label>
+                                                        <input type="number" className="form-control" name='productwholesaleprice' value={productwholesaleprice} onChange={(e) => setProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product retail price</label>
+                                                        <input type="number" className="form-control" name='productretailprice' value={productretailprice} onChange={(e) => setProductRetailPrice(e.target.value)} placeholder="Product retail price" />
+                                                    </div>
                                                     {
-                                                        productCategoriesList == undefined ? <h1>Loading...</h1> :
-                                                            productCategoriesList.map(category => (
-                                                                <option value={category.id}>{category.name}</option>
-                                                            ))
+                                                        productthumbnail != null ?
+                                                            <div>
+                                                                <img src={URL.createObjectURL(productthumbnail)} style={{ height: "200px", width: "200px" }} /> <h6>{productthumbnail.name}</h6>
+                                                            </div> :
+                                                            <h6></h6>
                                                     }
-                                                </select>
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product barcode</label>
-                                                <input type="text" className="form-control" name='barcode' value={productprofile.barcode} onChange={handleChange} placeholder="Product barcode" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product brand</label>
-                                                <input type="text" className="form-control" name='brand' value={productprofile.brand} onChange={handleChange} placeholder="Product brand" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product specification</label>
-                                                <input type="text" className="form-control" name='specification' value={productprofile.specification} onChange={handleChange} placeholder="Product specification" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product description</label>
-                                                <input type="text" className="form-control" name='description' value={productprofile.description} onChange={handleChange} placeholder="Product description" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product min quantity</label>
-                                                <input type="number" className="form-control" name='productminquantity' value={productminquantity} onChange={(e) => setProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product wholesale price</label>
-                                                <input type="number" className="form-control" name='productwholesaleprice' value={productwholesaleprice} onChange={(e) => setProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product retail price</label>
-                                                <input type="number" className="form-control" name='productretailprice' value={productretailprice} onChange={(e) => setProductRetailPrice(e.target.value)} placeholder="Product retail price" />
-                                            </div>
-                                            {
-                                                productthumbnail != null ?
-                                                    <div>
-                                                        <img src={URL.createObjectURL(productthumbnail)} style={{ height: "200px", width: "200px" }} /> <h6>{productthumbnail.name}</h6>
-                                                    </div> :
-                                                    <h6></h6>
-                                            }
 
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product thumbnail</label><br></br>
-                                                <input type="file" accept="image/*" onChange={(e) => setProductThumbnail(e.target.files[0])} placeholder="Product thumbnail" />
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product thumbnail</label><br></br>
+                                                        <input type="file" accept="image/*" onChange={(e) => setProductThumbnail(e.target.files[0])} placeholder="Product thumbnail" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product images</label><br></br>
+                                                        <input type="file" accept="image/*" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product images</label><br></br>
-                                                <input type="file" accept="image/*" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
-                                            </div>
+
+
                                             <div className="col-lg-12 mt-4">
                                                 <div className="d-flex flex-wrap align-items-ceter justify-content-center">
                                                     <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
@@ -341,67 +348,71 @@ const ProductsList = () => {
 
                 {/* Editing Product Model */}
                 <div className="modal fade" id="edit-product" tabIndex="-1" role="dialog" aria-hidden="true">
-                    <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-dialog modal-xl modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="modal-body">
                                 <div className="popup text-left">
                                     <h4 className="mb-3">Edit Product</h4>
                                     <div className="content create-workform bg-body">
                                         <form encType='multipart/form-data'>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product name</label>
-                                                <input type="text" className="form-control" name='editproductname' value={editproductname} onChange={(e) => setEditProductName(e.target.value)} placeholder="Product name" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product category</label>
-                                                <select value={editproductcategory} onChange={(e) => setEditProductCategory(e.target.value)} className="form-control" aria-label="">
-                                                    <option selected>Select category</option>
-                                                    {
-                                                        productCategoriesList == undefined ? <h1>Loading...</h1> :
-                                                            productCategoriesList.map(category => (
-                                                                <option value={category.id}>{category.name}</option>
+                                            <div className='row'>
+                                                <div className='col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12'>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product name</label>
+                                                        <input type="text" className="form-control" name='editproductname' value={editproductname} onChange={(e) => setEditProductName(e.target.value)} placeholder="Product name" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product category</label>
+                                                        <select value={editproductcategory} onChange={(e) => setEditProductCategory(e.target.value)} className="form-control" aria-label="">
+                                                            <option selected>Select category</option>
+                                                            {
+                                                                productCategoriesList == undefined ? <h1>Loading...</h1> :
+                                                                    productCategoriesList.map(category => (
+                                                                        <option value={category.id}>{category.name}</option>
 
-                                                            ))
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product barcode</label>
-                                                <input type="text" className="form-control" name='barcode' value={editproductbardcode} onChange={(e) => setEditProductBarcode(e.target.value)} placeholder="Product barcode" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product brand</label>
-                                                <input type="text" className="form-control" name='brand' value={editproductbrand} onChange={(e) => setEditProductBrand(e.target.value)} placeholder="Product brand" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product specification</label>
-                                                <input type="text" className="form-control" name='specification' value={editproductspecification} onChange={(e) => setEditProductSpecification(e.target.value)} placeholder="Product specification" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product description</label>
-                                                <input type="text" className="form-control" name='description' value={editproductdescription} onChange={(e) => setEditProductDescription(e.target.value)} placeholder="Product description" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product Stoked</label><br></br>
-                                                <input type="checkbox" name='productstoked' value='Any' checked={editproductStoked} onChange={handleStocked} />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product min quantity</label>
-                                                <input type="number" className="form-control" name='productminquantity' value={editproductminquantity} onChange={(e) => setEditProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product wholesale price</label>
-                                                <input type="number" className="form-control" name='productwholesaleprice' value={editproductwholesaleprice} onChange={(e) => setEditProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product retail price</label>
-                                                <input type="number" className="form-control" name='productretailprice' value={editproductretailprice} onChange={(e) => setEditProductRetailPrice(e.target.value)} placeholder="Product retail price" />
-                                            </div>
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product thumbnail</label><br></br>
-                                                <input type="file" accept="image/png,image/jpeg" name='editproductimage' onChange={(e) => setEditProductImage(e.target.files[0])} />
-                                            </div>
-                                            {/* {
+                                                                    ))
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product barcode</label>
+                                                        <input type="text" className="form-control" name='barcode' value={editproductbardcode} onChange={(e) => setEditProductBarcode(e.target.value)} placeholder="Product barcode" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product brand</label>
+                                                        <input type="text" className="form-control" name='brand' value={editproductbrand} onChange={(e) => setEditProductBrand(e.target.value)} placeholder="Product brand" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product specification</label>
+                                                        <input type="text" className="form-control" name='specification' value={editproductspecification} onChange={(e) => setEditProductSpecification(e.target.value)} placeholder="Product specification" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product description</label>
+                                                        <input type="text" className="form-control" name='description' value={editproductdescription} onChange={(e) => setEditProductDescription(e.target.value)} placeholder="Product description" />
+                                                    </div>
+                                                </div>
+                                                <div className='col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12'>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product Stoked</label><br></br>
+                                                        <input type="checkbox" name='productstoked' value='Any' checked={editproductStoked} onChange={handleStocked} />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product min quantity</label>
+                                                        <input type="number" className="form-control" name='productminquantity' value={editproductminquantity} onChange={(e) => setEditProductMinQuantity(e.target.value)} placeholder="Product min quantity" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product wholesale price</label>
+                                                        <input type="number" className="form-control" name='productwholesaleprice' value={editproductwholesaleprice} onChange={(e) => setEditProductWholesalePrice(e.target.value)} placeholder="Product wholesale price" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product retail price</label>
+                                                        <input type="number" className="form-control" name='productretailprice' value={editproductretailprice} onChange={(e) => setEditProductRetailPrice(e.target.value)} placeholder="Product retail price" />
+                                                    </div>
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product thumbnail</label><br></br>
+                                                        <input type="file" accept="image/png,image/jpeg" name='editproductimage' onChange={(e) => setEditProductImage(e.target.files[0])} />
+                                                    </div>
+                                                    {/* {
                                                 editproductimage != null ?
                                                     <div>
                                                         <img src={URL.createObjectURL(editproductimage)} style={{ height: "200px", width: "200px" }} /> <h6>{editproductimage.name}</h6>
@@ -409,10 +420,14 @@ const ProductsList = () => {
                                                     <h6></h6>
                                             } */}
 
-                                            <div className="pb-3">
-                                                <label className="mb-2">Product images</label><br></br>
-                                                <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                                    <div className="pb-3">
+                                                        <label className="mb-2">Product images</label><br></br>
+                                                        <input type="file" accept="image/png,image/jpeg" multiple onChange={(e) => setProductPhotos(e.target.files)} placeholder="Product photos" />
+                                                    </div>
+                                                </div>
                                             </div>
+
+
                                             <div className="col-lg-12 mt-4">
                                                 <div className="d-flex flex-wrap align-items-ceter justify-content-center">
                                                     <div className="btn btn-primary mr-4" data-dismiss="modal">Cancel</div>
