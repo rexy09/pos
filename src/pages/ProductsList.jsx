@@ -59,6 +59,10 @@ const ProductsList = () => {
 
         const thumbnailImage = new FormData();
         thumbnailImage.append('editproductimage',editproductimage)
+
+        for(var x of thumbnailImage){
+            console.log(x)
+        }
         
         var editproductprofile = {
             id: parseInt(editproductid),
