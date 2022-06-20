@@ -19,7 +19,7 @@ export const productListSlice = createApi({
             providesTags: ['ProductList']
         }),
         addProduct: builder.mutation({
-            query: (product) => ({
+            query: (product) =>  ({
                 url: 'add/product',
                 method: 'POST',
                 body: product

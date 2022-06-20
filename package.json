@@ -10,6 +10,7 @@
     "react": "^18.1.0",
     "react-circular-loader": "^0.1.4",
     "react-dom": "^18.1.0",
+    "react-lines-ellipsis": "^0.15.1",
     "react-notification-components": "^1.0.7",
     "react-notifications": "^1.7.3",
     "react-notifications-component": "^4.0.0",

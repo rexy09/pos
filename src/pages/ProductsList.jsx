@@ -2,6 +2,9 @@ import { React, useEffect, useState } from 'react';
 import { useGetProductListQuery, useAddProductMutation, useEditProductMutation, useDeleteProductMutation } from '../services/productListSlice';
 import { useGetProductCategoriesQuery } from '../services/productCategoriesSlice';
 import { CheckInternetConnection, Loader, EmptyTable } from '../components';
+import LinesEllipsis from 'react-lines-ellipsis'
+
+
 
 const ProductsList = () => {
     // Hooks Section
@@ -110,6 +113,7 @@ const ProductsList = () => {
     const addProductSubmit = (e) => {
         e.preventDefault();
 
+        let formData = new FormData();
         // const imageData1 = new FormData()
         // imageData1.append("productthumbnail", productthumbnail)
 
@@ -128,16 +132,51 @@ const ProductsList = () => {
         // // reader.readAsDataURL(productthumbnail);
         // reader.readAsText(productthumbnail);
 
-        var injectedObjects = {
-            category: parseInt(productcategory),
-            min_quantity: parseInt(productminquantity),
-            wholesale_price: parseFloat(productwholesaleprice),
-            retail_price: parseFloat(productretailprice),
-            image: productthumbnail.name,
-            product_images: productphotos
+
+        formData.append("category", parseInt(productcategory));
+        formData.append("min_quantity", parseInt(productminquantity));
+        formData.append("wholesale_price", parseFloat(productwholesaleprice));
+        formData.append("retail_price", parseFloat(productretailprice));
+        formData.append("name", productprofile.name);
+        formData.append("barcode", productprofile.barcode);
+        formData.append("brand", productprofile.brand);
+        formData.append("specification", productprofile.specification);
+        formData.append("description", productprofile.description);
+        formData.append("image", productthumbnail);
+        // console.log(productphotos);
+        // var productImages = [];
+        // console.log(productphotos.length);
+
+        for (let index = 0; index < productphotos.length; index++) {
+            var file = productphotos[index];
+            console.log(file);
+            // productImages.push(file);
+            formData.append("product_images", file);
+
         }
-        var updatedproductprofile = { ...productprofile, ...injectedObjects }
-        addProduct(updatedproductprofile)
+      
+        // formData.append("product_images", productphotos);
+        // formData.append("product_images", productImages);
+        // console.log(productImages);
+
+
+        // var injectedObjects = {
+        //     category: parseInt(productcategory),
+        //     min_quantity: parseInt(productminquantity),
+        //     wholesale_price: parseFloat(productwholesaleprice),
+        //     retail_price: parseFloat(productretailprice),
+        //     image: productthumbnail,
+        //     product_images: productphotos
+        // }
+        // console.log(injectedObjects)
+
+        // var updatedproductprofile = { ...productprofile, ...injectedObjects }
+        // console.log(updatedproductprofile)
+        // addProduct(updatedproductprofile)
+        console.log(formData)
+
+
+        addProduct(formData)
     }
     if (isFetching) {
         return <Loader />
@@ -221,15 +260,36 @@ const ProductsList = () => {
                                                         </td>
                                                         <td>
                                                             <div className="d-flex align-items-center">
-                                                                <img src='' className="img-fluid rounded avatar-50 mr-3" alt="image" />
+                                                                <img src={`http://127.0.0.1:8000${product.image}`} className="img-fluid rounded avatar-50 mr-3" alt="image" />
                                                             </div>
+                                                            {product.product_images.map(image => (
+                                                                <img src={`http://127.0.0.1:8000${image.image}`} className="img-fluid rounded avatar-50 mr-3" alt="image" />
+
+                                                            ))}
+                                                            
                                                         </td>
                                                         <td>{product.name}</td>
                                                         <td>{product.barcode}</td>
                                                         <td>{product.category}</td>
                                                         <td>{product.brand}</td>
-                                                        <td>{product.description}</td>
-                                                        <td>{product.specification}</td>
+                                                        <td>
+                                                            <LinesEllipsis
+                                                                text={product.description}
+                                                                maxLine='1'
+                                                                ellipsis='...'
+                                                                trimRight
+                                                                basedOn='letters'
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <LinesEllipsis
+                                                                text={product.specification}
+                                                                maxLine='1'
+                                                                ellipsis='...'
+                                                                trimRight
+                                                                basedOn='letters'
+                                                            />
+                                                        </td>
                                                         <td>{product.min_quantity}</td>
                                                         <td>{product.wholesale_price}</td>
                                                         <td>{product.retail_price}</td>
