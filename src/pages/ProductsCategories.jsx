@@ -39,7 +39,7 @@ const ProductsCategories = () => {
             alert('Please use a relevant name');
         } else {
             addProductCategories({ name: newproductcategory })
-            setNewProductCategory('')
+            // setNewProductCategory('')
         }
     }
 

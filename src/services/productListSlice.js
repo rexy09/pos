@@ -2,16 +2,24 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 const baseUrl = 'http://127.0.0.1:8000/inventory/'
 
 const Headers = {
-    'Content-Type':'multipart/form-data',
-    'Accept':'application/json',
-   
+    'Content-Type': 'multipart/form-data',
+    'Accept': 'application/json',
+
 }
 
-const createRequest = (url) => ({ url, headers:Headers })
+const createRequest = (url) => ({ url, headers: Headers })
 
 export const productListSlice = createApi({
     reducerPath: 'productListSlice',
-    baseQuery: fetchBaseQuery({ baseUrl }),
+    baseQuery: fetchBaseQuery({
+        baseUrl,
+        // prepareHeaders: (headers, { getState }) => {
+        //     headers.set('Content-Type', 'multipart/form-data');
+        //     headers.set('Accept', 'application/json');
+
+        //     return headers
+        // }
+    }),
     tagTypes: ['ProductList'],
     endpoints: (builder) => ({
         getProductList: builder.query({
@@ -46,7 +54,7 @@ export const productListSlice = createApi({
 
         })
     })
-    
+
 });
 
 export const { useGetProductListQuery, useAddProductMutation, useEditProductMutation, useDeleteProductMutation } = productListSlice

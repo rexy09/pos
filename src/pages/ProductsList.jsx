@@ -28,42 +28,36 @@ const ProductsList = () => {
     const [editproductwholesaleprice, setEditProductWholesalePrice] = useState(null)
     const [editproductretailprice, setEditProductRetailPrice] = useState(null)
     const [editproductimage, setEditProductImage] = useState(null)
-    const [imagetobase64, setEditProductImageBase64] = useState(null)
+    // const [imagetobase64, setEditProductImageBase64] = useState(null)
 
 
-    let extractedThumbnail
+    // let extractedThumbnail
 
     const [useEditProduct] = useEditProductMutation()
     const handleStocked = (e) => {
         e.preventDefault();
         setEditProductStoked(!editproductStoked)
+        // console.log(editproductStoked)
     }
-
-
-    // Thumbanil Image to base64
-    // const ThumbnailBase64Converter = (e) => {
-    //     var file = e.target.files[0];
-    //     var reader = new FileReader();
-    //     reader.onloadend = () => {
-    //         extractedThumbnail = reader.result;
-    //         setEditProductImage(extractedThumbnail)
-    //     };
-    //     reader.readAsDataURL(file);
-
-    // }
-
-
 
     const handleCapturedProductData = (e) => {
         e.preventDefault();
 
-        const thumbnailImage = new FormData();
-        thumbnailImage.append('editproductimage',editproductimage)
+        let formData = new FormData();
+        // formData.append( 'id', parseInt(editproductid))
+        // formData.append('category', parseInt(editproductcategory))
+        // formData.append( 'name', editproductname)
+        // formData.append('barcode',editproductbardcode)
+        // formData.append('brand',editproductbrand)
+        // formData.append('specification',editproductspecification)
+        // formData.append('description',editproductdescription)
+        // formData.append('stocked',JSON.parse(editproductStoked))
+        // formData.append('min_quantity',parseInt(editproductminquantity))
+        // formData.append('wholesale_price',parseFloat(editproductwholesaleprice))
+        // formData.append('retail_price',parseFloat(editproductretailprice))
+        formData.append('image', editproductimage)
 
-        for(var x of thumbnailImage){
-            console.log(x)
-        }
-        
+
         var editproductprofile = {
             id: parseInt(editproductid),
             category: parseInt(editproductcategory),
@@ -76,9 +70,8 @@ const ProductsList = () => {
             min_quantity: parseInt(editproductminquantity),
             wholesale_price: parseFloat(editproductwholesaleprice),
             retail_price: parseFloat(editproductretailprice),
-            image: thumbnailImage
+            image: formData
         }
-        
         useEditProduct(editproductprofile)
     }
 
@@ -109,35 +102,23 @@ const ProductsList = () => {
     const [addProduct] = useAddProductMutation()
     const addProductSubmit = (e) => {
         e.preventDefault();
+        let formData = new FormData();
+        formData.append("category", parseInt(productcategory));
+        formData.append("min_quantity", parseInt(productminquantity));
+        formData.append("wholesale_price", parseFloat(productwholesaleprice));
+        formData.append("retail_price", parseFloat(productretailprice));
+        formData.append("name", productprofile.name);
+        formData.append("barcode", productprofile.barcode);
+        formData.append("brand", productprofile.brand);
+        formData.append("specification", productprofile.specification);
+        formData.append("description", productprofile.description);
+        formData.append("image", productthumbnail);
 
-        // const imageData1 = new FormData()
-        // imageData1.append("productthumbnail", productthumbnail)
-
-        // const imageData2 = new FormData()
-        // imageData2.append('name', productphotos)
-
-        // console.log(productthumbnail)
-
-        // var extractedThumbnail
-        // var reader = new FileReader();
-        // reader.onloadend = () => {
-        //     extractedThumbnail = reader.result;
-        // console.log(extractedThumbnail)
-
-        // };
-        // // reader.readAsDataURL(productthumbnail);
-        // reader.readAsText(productthumbnail);
-
-        var injectedObjects = {
-            category: parseInt(productcategory),
-            min_quantity: parseInt(productminquantity),
-            wholesale_price: parseFloat(productwholesaleprice),
-            retail_price: parseFloat(productretailprice),
-            image: productthumbnail.name,
-            product_images: productphotos
-        }
-        var updatedproductprofile = { ...productprofile, ...injectedObjects }
-        addProduct(updatedproductprofile)
+        // for (let index = 0; index < productphotos.length; index++) {
+        //     var file = productphotos[index];
+        //     formData.append("product_images", file);
+        // }
+        addProduct(formData)
     }
     if (isFetching) {
         return <Loader />
@@ -221,7 +202,7 @@ const ProductsList = () => {
                                                         </td>
                                                         <td>
                                                             <div className="d-flex align-items-center">
-                                                                <img src='' className="img-fluid rounded avatar-50 mr-3" alt="image" />
+                                                                <img src={baseurl + product.image} className="img-fluid rounded avatar-50 mr-3" alt="image" />
                                                             </div>
                                                         </td>
                                                         <td>{product.name}</td>
@@ -417,12 +398,12 @@ const ProductsList = () => {
                                                         <input type="file" accept="image/png,image/jpeg" name='editproductimage' onChange={(e) => setEditProductImage(e.target.files[0])} />
                                                     </div>
                                                     {/* {
-                                                editproductimage != null ?
-                                                    <div>
-                                                        <img src={URL.createObjectURL(editproductimage)} style={{ height: "200px", width: "200px" }} /> <h6>{editproductimage.name}</h6>
-                                                    </div> :
-                                                    <h6></h6>
-                                            } */}
+                                                        editproductimage != null ?
+                                                            <div>
+                                                                <img src={URL.createObjectURL(editproductimage)} style={{ height: "200px", width: "200px" }} /> <h6>{editproductimage.name}</h6>
+                                                            </div> :
+                                                            <h6></h6>
+                                                    } */}
 
                                                     <div className="pb-3">
                                                         <label className="mb-2">Product images</label><br></br>
